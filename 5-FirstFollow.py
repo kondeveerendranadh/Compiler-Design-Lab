@@ -1,157 +1,270 @@
-import sys
-sys.setrecursionlimit(60)
+// C program to calculate the First and
+// Follow sets of a given grammar
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 
-def first(string):
-    #print("first({})".format(string))
-    first_ = set()
-    if string in non_terminals:
-        alternatives = productions_dict[string]
+// Functions to calculate Follow
+void followfirst(char, int, int);
+void follow(char c);
 
-        for alternative in alternatives:
-            first_2 = first(alternative)
-            first_ = first_ |first_2
+// Function to calculate First
+void findfirst(char, int, int);
 
-    elif string in terminals:
-        first_ = {string}
+int count, n = 0;
 
-    elif string=='' or string=='@':
-        first_ = {'@'}
+// Stores the final result
+// of the First Sets
+char calc_first[10][100];
 
-    else:
-        first_2 = first(string[0])
-        if '@' in first_2:
-            i = 1
-            while '@' in first_2:
-                #print("inside while")
+// Stores the final result
+// of the Follow Sets
+char calc_follow[10][100];
+int m = 0;
 
-                first_ = first_ | (first_2 - {'@'})
-                #print('string[i:]=', string[i:])
-                if string[i:] in terminals:
-                    first_ = first_ | {string[i:]}
-                    break
-                elif string[i:] == '':
-                    first_ = first_ | {'@'}
-                    break
-                first_2 = first(string[i:])
-                first_ = first_ | first_2 - {'@'}
-                i += 1
-        else:
-            first_ = first_ | first_2
+// Stores the production rules
+char production[10][10];
+char f[10], first[10];
+int k;
+char ck;
+int e;
 
+int main(int argc, char** argv)
+{
+	int jm = 0;
+	int km = 0;
+	int i, choice;
+	char c, ch;
+	count = 8;
 
-    #print("returning for first({})".format(string),first_)
-    return  first_
+	// The Input grammar
+	strcpy(production[0], "X=TnS");
+	strcpy(production[1], "X=Rm");
+	strcpy(production[2], "T=q");
+	strcpy(production[3], "T=#");
+	strcpy(production[4], "S=p");
+	strcpy(production[5], "S=#");
+	strcpy(production[6], "R=om");
+	strcpy(production[7], "R=ST");
 
+	int kay;
+	char done[count];
+	int ptr = -1;
 
-def follow(nT):
-    #print("inside follow({})".format(nT))
-    follow_ = set()
-    #print("FOLLOW", FOLLOW)
-    prods = productions_dict.items()
-    if nT==starting_symbol:
-        follow_ = follow_ | {'$'}
-    for nt,rhs in prods:
-        #print("nt to rhs", nt,rhs)
-        for alt in rhs:
-            for char in alt:
-                if char==nT:
-                    following_str = alt[alt.index(char) + 1:]
-                    if following_str=='':
-                        if nt==nT:
-                            continue
-                        else:
-                            follow_ = follow_ | follow(nt)
-                    else:
-                        follow_2 = first(following_str)
-                        if '@' in follow_2:
-                            follow_ = follow_ | follow_2-{'@'}
-                            follow_ = follow_ | follow(nt)
-                        else:
-                            follow_ = follow_ | follow_2
-    #print("returning for follow({})".format(nT),follow_)
-    return follow_
+	// Initializing the calc_first array
+	for (k = 0; k < count; k++) {
+		for (kay = 0; kay < 100; kay++) {
+			calc_first[k][kay] = '!';
+		}
+	}
+	int point1 = 0, point2, xxx;
 
+	for (k = 0; k < count; k++) {
+		c = production[k][0];
+		point2 = 0;
+		xxx = 0;
 
+		// Checking if First of c has
+		// already been calculated
+		for (kay = 0; kay <= ptr; kay++)
+			if (c == done[kay])
+				xxx = 1;
 
+		if (xxx == 1)
+			continue;
 
+		// Function call
+		findfirst(c, 0, 0);
+		ptr += 1;
 
-no_of_terminals=int(input("Enter no. of terminals: "))
+		// Adding c to the calculated list
+		done[ptr] = c;
+		printf("\n First(%c) = { ", c);
+		calc_first[point1][point2++] = c;
 
-terminals = []
+		// Printing the First Sets of the grammar
+		for (i = 0 + jm; i < n; i++) {
+			int lark = 0, chk = 0;
 
-print("Enter the terminals :")
-for _ in range(no_of_terminals):
-    terminals.append(input())
+			for (lark = 0; lark < point2; lark++) {
 
-no_of_non_terminals=int(input("Enter no. of non terminals: "))
+				if (first[i] == calc_first[point1][lark]) {
+					chk = 1;
+					break;
+				}
+			}
+			if (chk == 0) {
+				printf("%c, ", first[i]);
+				calc_first[point1][point2++] = first[i];
+			}
+		}
+		printf("}\n");
+		jm = n;
+		point1++;
+	}
+	printf("\n");
+	printf("-----------------------------------------------"
+		"\n\n");
+	char donee[count];
+	ptr = -1;
 
-non_terminals = []
+	// Initializing the calc_follow array
+	for (k = 0; k < count; k++) {
+		for (kay = 0; kay < 100; kay++) {
+			calc_follow[k][kay] = '!';
+		}
+	}
+	point1 = 0;
+	int land = 0;
+	for (e = 0; e < count; e++) {
+		ck = production[e][0];
+		point2 = 0;
+		xxx = 0;
 
-print("Enter the non terminals :")
-for _ in range(no_of_non_terminals):
-    non_terminals.append(input())
+		// Checking if Follow of ck
+		// has already been calculated
+		for (kay = 0; kay <= ptr; kay++)
+			if (ck == donee[kay])
+				xxx = 1;
 
-starting_symbol = input("Enter the starting symbol: ")
+		if (xxx == 1)
+			continue;
+		land += 1;
 
-no_of_productions = int(input("Enter no of productions: "))
+		// Function call
+		follow(ck);
+		ptr += 1;
 
-productions = []
+		// Adding ck to the calculated list
+		donee[ptr] = ck;
+		printf(" Follow(%c) = { ", ck);
+		calc_follow[point1][point2++] = ck;
 
-print("Enter the productions:")
-for _ in range(no_of_productions):
-    productions.append(input())
+		// Printing the Follow Sets of the grammar
+		for (i = 0 + km; i < m; i++) {
+			int lark = 0, chk = 0;
+			for (lark = 0; lark < point2; lark++) {
+				if (f[i] == calc_follow[point1][lark]) {
+					chk = 1;
+					break;
+				}
+			}
+			if (chk == 0) {
+				printf("%c, ", f[i]);
+				calc_follow[point1][point2++] = f[i];
+			}
+		}
+		printf(" }\n\n");
+		km = m;
+		point1++;
+	}
+}
 
+void follow(char c)
+{
+	int i, j;
 
-#print("terminals", terminals)
+	// Adding "$" to the follow
+	// set of the start symbol
+	if (production[0][0] == c) {
+		f[m++] = '$';
+	}
+	for (i = 0; i < 10; i++) {
+		for (j = 2; j < 10; j++) {
+			if (production[i][j] == c) {
+				if (production[i][j + 1] != '\0') {
+					// Calculate the first of the next
+					// Non-Terminal in the production
+					followfirst(production[i][j + 1], i,
+								(j + 2));
+				}
 
-#print("non terminals", non_terminals)
+				if (production[i][j + 1] == '\0'
+					&& c != production[i][0]) {
+					// Calculate the follow of the
+					// Non-Terminal in the L.H.S. of the
+					// production
+					follow(production[i][0]);
+				}
+			}
+		}
+	}
+}
 
-#print("productions",productions)
+void findfirst(char c, int q1, int q2)
+{
+	int j;
 
+	// The case where we
+	// encounter a Terminal
+	if (!(isupper(c))) {
+		first[n++] = c;
+	}
+	for (j = 0; j < count; j++) {
+		if (production[j][0] == c) {
+			if (production[j][2] == '#') {
+				if (production[q1][q2] == '\0')
+					first[n++] = '#';
+				else if (production[q1][q2] != '\0'
+						&& (q1 != 0 || q2 != 0)) {
+					// Recursion to calculate First of New
+					// Non-Terminal we encounter after
+					// epsilon
+					findfirst(production[q1][q2], q1,
+							(q2 + 1));
+				}
+				else
+					first[n++] = '#';
+			}
+			else if (!isupper(production[j][2])) {
+				first[n++] = production[j][2];
+			}
+			else {
+				// Recursion to calculate First of
+				// New Non-Terminal we encounter
+				// at the beginning
+				findfirst(production[j][2], j, 3);
+			}
+		}
+	}
+}
 
-productions_dict = {}
+void followfirst(char c, int c1, int c2)
+{
+	int k;
 
-for nT in non_terminals:
-    productions_dict[nT] = []
+	// The case where we encounter
+	// a Terminal
+	if (!(isupper(c)))
+		f[m++] = c;
+	else {
+		int i = 0, j = 1;
+		for (i = 0; i < count; i++) {
+			if (calc_first[i][0] == c)
+				break;
+		}
 
-
-#print("productions_dict",productions_dict)
-
-for production in productions:
-    nonterm_to_prod = production.split("->")
-    alternatives = nonterm_to_prod[1].split("/")
-    for alternative in alternatives:
-        productions_dict[nonterm_to_prod[0]].append(alternative)
-
-#print("productions_dict",productions_dict)
-
-#print("nonterm_to_prod",nonterm_to_prod)
-#print("alternatives",alternatives)
-
-
-FIRST = {}
-FOLLOW = {}
-
-for non_terminal in non_terminals:
-    FIRST[non_terminal] = set()
-
-for non_terminal in non_terminals:
-    FOLLOW[non_terminal] = set()
-
-#print("FIRST",FIRST)
-
-for non_terminal in non_terminals:
-    FIRST[non_terminal] = FIRST[non_terminal] | first(non_terminal)
-
-#print("FIRST",FIRST)
-
-
-FOLLOW[starting_symbol] = FOLLOW[starting_symbol] | {'$'}
-for non_terminal in non_terminals:
-    FOLLOW[non_terminal] = FOLLOW[non_terminal] | follow(non_terminal)
-
-#print("FOLLOW", FOLLOW)
-
-print("{: ^20}{: ^20}{: ^20}".format('Non Terminals','First','Follow'))
-for non_terminal in non_terminals:
-    print("{: ^20}{: ^20}{: ^20}".format(non_terminal,str(FIRST[non_terminal]),str(FOLLOW[non_terminal])))
+		// Including the First set of the
+		// Non-Terminal in the Follow of
+		// the original query
+		while (calc_first[i][j] != '!') {
+			if (calc_first[i][j] != '#') {
+				f[m++] = calc_first[i][j];
+			}
+			else {
+				if (production[c1][c2] == '\0') {
+					// Case where we reach the
+					// end of a production
+					follow(production[c1][0]);
+				}
+				else {
+					// Recursion to the next symbol
+					// in case we encounter a "#"
+					followfirst(production[c1][c2], c1,
+								c2 + 1);
+				}
+			}
+			j++;
+		}
+	}
+}
